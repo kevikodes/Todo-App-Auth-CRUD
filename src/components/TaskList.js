@@ -3,8 +3,8 @@ import Task from "./Task";
 import FilterControl from "./FilterControl";
 // #7a import deleteDoc and doc from 'firebase/firestore"
 // #7b import db from '../utils/firebase"
-import { deleteDoc,doc } from 'firebase/firestore'
-import db from '../utils/firebase'
+import { deleteDoc, doc, setDoc } from "firebase/firestore";
+import { db } from "../utils/firebase";
 
 function TaskList({
   tasks,
@@ -12,17 +12,22 @@ function TaskList({
   filterStatus,
   filteredTasks,
   setTasks,
+  currentUser,
 }) {
-
   const clearCompleted = () => {
     // setTasks(tasks.filter((task) => task.status !== true));
-
     // #8 Look through every filtered task and if the status has a value of false it will stay in the array
-    filteredTasks.forEach((item)=> {
-      if(item.status === true) {
-         deleteDoc(doc(db,"tasks", item.id))
-      }
-  })
+    // filteredTasks.forEach((item) => {
+    //   if (item.status === true) {
+    //     deleteDoc(doc(db, "tasks", item.id));
+    //   }
+    // });
+    const docRef = doc(db, "users", currentUser);
+    let arrayRef = filteredTasks.filter((task) => task.status === false);
+    let payload = {
+      tasks: arrayRef,
+    };
+    setDoc(docRef, payload);
   };
   return (
     <div className="todo-items-wrapper">
@@ -31,7 +36,14 @@ function TaskList({
         {/* #11 switch tasks.map to filteredTasks.map() */}
         {filteredTasks.map((item) => {
           return (
-            <Task task={item} key={item.id} tasks={tasks} setTasks={setTasks} />
+            <Task
+              task={item}
+              key={item.id}
+              tasks={tasks}
+              setTasks={setTasks}
+              currentUser={currentUser}
+              filteredTasks={filteredTasks}
+            />
           );
         })}
       </div>

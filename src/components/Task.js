@@ -2,11 +2,10 @@ import React, { useState } from "react";
 import checkImage from "../images/icon-check.svg";
 // #5b import setDoc and doc from 'firebase/firestore
 // #5b import db from "../utils/firebase"
-import { setDoc,doc } from "firebase/firestore"
-import db from "../utils/firebase";
+import { setDoc, doc } from "firebase/firestore";
+import { db } from "../utils/firebase";
 
-function Task({ task, tasks, setTasks }) {
-
+function Task({ task, tasks, setTasks, currentUser, filteredTasks }) {
   const [mutableTask, setMutableTask] = useState(task);
 
   const checked = mutableTask.status ? "checked" : "";
@@ -20,7 +19,7 @@ function Task({ task, tasks, setTasks }) {
   const markCompleted = () => {
     // For frontend CSS
     setMutableTask({ ...mutableTask, status: !mutableTask.status });
-    
+
     // For backend data
     // const updatedTasks = tasks.map((item) =>
     //   item.id === task.id ? { ...item, status: !item.status } : item
@@ -28,9 +27,18 @@ function Task({ task, tasks, setTasks }) {
     // setTasks(updatedTasks);
 
     // #6 for firebase data
-    const docRef = doc(db, "tasks", task.id)
-    const payload = {text: task.text, status: !task.status, id: task.id }
-    setDoc(docRef, payload)
+    // const docRef = doc(db, "tasks", task.id);
+    // const payload = { text: task.text, status: !task.status, id: task.id };
+    // setDoc(docRef, payload);
+    const docRef = doc(db, "users", currentUser);
+    console.log(task);
+    let arrRef = filteredTasks;
+    const index = filteredTasks.indexOf(task);
+    arrRef[index].status = !arrRef[index].status;
+    const payload = {
+      tasks: filteredTasks,
+    };
+    setDoc(docRef, payload);
   };
   return (
     <div className="todo-item">
